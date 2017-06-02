@@ -1,6 +1,6 @@
-## PSDocumentDB
+## PSCosmosDB
 
-### This is a library of Powershell commands which can be used to interact with Document DB.
+### This is a library of Powershell commands which can be used to interact with Cosmos DB.
 
 ### Feel free to create issues if you find any. Or request which command you need me to add next, as this library will be filled out sporadically. 
 
@@ -9,17 +9,17 @@
 
 Clone the codebase
 ```
-git clone https://github.com/bytejunkie/psdocumentdb
+git clone https://github.com/bytejunkie/pscosmosdb
 ```
 
 Import the module
 ```powershell
-import-module .\psDocumentDB.psm1 -force -verbose
+import-module .\PSCosmosDB.psm1 -force -verbose
 ```
 
 setup some variables
 ```powershell
-# the accountName used for the Document DB account. 
+# the accountName used for the Cosmos DB account. 
 $accountName = "bytejunkie"
 # The ReadWrite access key if you need to make changes or add to. 
 $primaryAccessKey = "weflnweflwef/.wecwef./wfwef/=="
@@ -30,23 +30,23 @@ query away...
 
 ### list databases
 ```powershell
-Get-DocumentDBDatabases -AccountName $accountName -PrimaryAccessKey $primaryAccessKey
+Get-CosmosDatabases -AccountName $accountName -PrimaryAccessKey $primaryAccessKey
 ```
 
 ### add a database
 ```powershell
-New-DocumentDBDatabase -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+New-CosmosDBDatabase -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
                         -NewDBName <insert_db_name_here>
 ```
 
 ### list collections
 ```powershell
-Get-DocumentDBCollections -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+Get-CosmosDBCollections -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
                             -DBName <insert_db_name_here>
 ```
 ### add a collection
 ```powershell
-New-DocumentDBCollection -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+New-CosmosDBCollection -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
                             -DBName <insert_db_name_here> `
                             -newCollectionName <insert_collection_name_here> `
                             -xmsofferthroughput <insert_offer_throughput_here>
@@ -54,7 +54,7 @@ New-DocumentDBCollection -AccountName $accountName -PrimaryAccessKey $primaryAcc
 
 ### list documents
 ```powershell
-Get-DocumentDBDocuments -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+Get-CosmosDBDocuments -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
                             -DBName <insert_db_name_here> `
                             -CollectionName <insert_collection_name_here> `
                             -xmsmaxitemcount <insert_max_item_count_here>
@@ -62,7 +62,7 @@ Get-DocumentDBDocuments -AccountName $accountName -PrimaryAccessKey $primaryAcce
 
 ### add a document
 ```powershell
-New-DocumentDBDocument -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+New-CosmosDBDocument -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
                             -DBName <insert_db_name_here> `
                             -CollectionName <insert_collection_name_here> `
                             -xmsmaxitemcount <insert_max_item_count_here> `
