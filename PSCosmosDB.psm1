@@ -109,7 +109,6 @@ Param(
         [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
 
         # build the URI
-        # $rootUri = 'https://' + $accountName + '.documents.azure.com'
         $uri = $rootUri + "/dbs"
  
         # build the headers
@@ -136,11 +135,15 @@ Param(
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey
+            [string]$primaryAccessKey,
+
+            # the URI string for the Cosmos DB instance
+            [Parameter()]
+            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+
         )
 
         # build the URI
-        $rootUri = 'https://' + $accountName + '.documents.azure.com'
         $uri = $rootUri + '/dbs'
 
         # build the headers
@@ -167,13 +170,18 @@ Param(
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey
+            [string]$primaryAccessKey,
+
+            # the URI string for the Cosmos DB instance
+            [Parameter()]
+            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
 
         ) 
 
         # build the URI
         $uri = $rootUri + '/dbs/' + $dbname + '/colls'
         $resourceID = 'dbs/' + $dbname
+
         # build the headers
         $headers = Get-Headers -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
         write-host $uri
@@ -203,7 +211,12 @@ Param(
             [string]$primaryAccessKey,
 
             # x-ms-offer-throughput needed to size the new collection
-            $xmsofferthroughput = '10000'
+            $xmsofferthroughput = '10000',
+
+            # the URI string for the Cosmos DB instance
+            [Parameter()]
+            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+
     
         )
     
@@ -243,7 +256,11 @@ Param(
             [string]$primaryAccessKey,
 
             # maximum number of items to return
-            [int]$xmsmaxitemcount = 50
+            [int]$xmsmaxitemcount = 50,
+
+            # the URI string for the Cosmos DB instance
+            [Parameter()]
+            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
 
         )
 
@@ -286,7 +303,12 @@ Param(
             [string]$primaryAccessKey,
 
             # the JSON document to upload
-            [string]$document
+            [string]$document,
+
+            # the URI string for the Cosmos DB instance
+            [Parameter()]
+            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+
         )
 
         # build the URI that we are sending the request to
@@ -300,9 +322,9 @@ Param(
 
         write-host "uri - " $uri
         write-host "collection - " $collection
-        #write-host $collectionName
+        write-host $collectionName
 
-        #write-host $document
+        write-host $document
         #foreach ($header in $headers.GetEnumerator()) { write-host $header}
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $document -ContentType 'application/json'
