@@ -32,12 +32,6 @@ Param(
 	[string]$primaryAccessKey
 
 ) 
-    
-        #Write-Host "Verb - " $verb
-        #Write-Host "resource type - " $resourceType
-        #Write-Host "resource ID - " $resourceID
-        #Write-Host "Date - " $date
-        #Write-host "Access key - " $primaryAccessKey
         
         $keyBytes = [System.Convert]::FromBase64String($primaryAccessKey) 
 
@@ -114,7 +108,7 @@ Param(
         # build the headers
         $headers = Get-Headers -resourceType dbs -primaryAccessKey $primaryAccessKey
  
-        write-host $uri
+        #write-host $uri
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers 
         $response.Databases
  
@@ -184,11 +178,11 @@ Param(
 
         # build the headers
         $headers = Get-Headers -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
-        write-host $uri
+        #write-host $uri
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
         $response.Documentcollections
  
-        Write-Host ("Found " + $Response.DocumentCollections.Count + " Document collection(s)")
+       Write-Host ("Found " + $Response.DocumentCollections.Count + " Document collection(s)")
     }
 
     function New-CosmosDBCollection {
@@ -216,10 +210,7 @@ Param(
             # the URI string for the Cosmos DB instance
             [Parameter()]
             [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
-
-    
         )
-    
     
         # build the URI that we are sending the request to
         $uri = $rootUri + '/dbs/' + $DBName + '/colls'
@@ -272,12 +263,11 @@ Param(
         $headers = Get-Headers -resourceType docs -resourceID $resourceID -primaryAccessKey $primaryAccessKey
         $headers.Add("x-ms-max-item-count",$xmsmaxitemcount)
 
-        write-host $uri
-        write-host $resourceID
+        #write-host $uri
+        #write-host $resourceID
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
         $response.Documents
  
-        #write-host $response
         Write-Host ("Found " + $Response.Documents.Count + " Document(s)")
     
     }
@@ -320,15 +310,6 @@ Param(
         # add in the upsert header.
         $headers.Add("x-ms-documentdb-is-upsert", "true")
 
-        write-host "uri - " $uri
-        write-host "collection - " $collection
-        write-host $collectionName
-
-        write-host $document
-        #foreach ($header in $headers.GetEnumerator()) { write-host $header}
-
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $document -ContentType 'application/json'
-
+        
     }
-
-
