@@ -91,7 +91,7 @@ Param(
     }
    
     
-    function Get-DocumentDBDatabases{
+    function Get-CosmosDBDatabases{
         [CmdletBinding()]
         Param(
         
@@ -121,7 +121,7 @@ Param(
         Write-Host ("Found " + $Response.Databases.Count + " Database(s)")
     }
 
-    function New-DocumentDBDatabase {
+    function New-CosmosDBDatabase {
         [CmdletBinding()]
         Param(
         
@@ -156,7 +156,7 @@ Param(
     }
 
 
-    function Get-DocumentDBCollections {
+    function Get-CosmosDBCollections {
         [CmdletBinding()]
         Param(
         
@@ -191,7 +191,7 @@ Param(
         Write-Host ("Found " + $Response.DocumentCollections.Count + " Document collection(s)")
     }
 
-    function New-DocumentDBCollection {
+    function New-CosmosDBCollection {
         [CmdletBinding()]
         Param(
             # the dbName to add a collection to
@@ -235,7 +235,7 @@ Param(
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
     }
 
-    function Get-DocumentDBDocuments {
+    function Get-CosmosDBDocuments {
         [CmdletBinding()]
         Param(    
 
@@ -282,7 +282,7 @@ Param(
     
     }
 
-    function New-DocumentDBDocument {
+    function New-CosmosDBDocument {
         [CmdletBinding()]
         Param(
 
