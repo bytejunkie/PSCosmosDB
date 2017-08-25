@@ -84,27 +84,59 @@ Param(
         return $headers
     }
    
+    function Get-RootURI {
+        [CmdletBinding()]
+        Param(
+        
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
+
+                    
+            # primary Access Key for the doc DB instance
+            [Parameter(Mandatory=$true)]
+            [string]$primaryAccessKey
+        )
+
+                # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
+        return $rootUri
+    }
     
     function Get-CosmosDBDatabases{
         [CmdletBinding()]
         Param(
         
         # the account name to connect to
-        [Parameter(Mandatory=$true)]
+        [Parameter(ParameterSetName="accountName")]
         [string]$accountName, 
 
+        # the emulatorAddress to connect to
+        [Parameter(ParameterSetName="emulatorAddress")]
+        [string]$emulatorAddress, 
+             
         # primary Access Key for the doc DB instance
         [Parameter(Mandatory=$true)]
         [string]$primaryAccessKey
-        ),
+        )
 
         # the URI string for the Cosmos DB instance
-        [Parameter()]
-        [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
 
         # build the URI
         $uri = $rootUri + "/dbs"
- 
+        write-host $uri
+
         # build the headers
         $headers = Get-Headers -resourceType dbs -primaryAccessKey $primaryAccessKey
  
@@ -124,18 +156,25 @@ Param(
             [string]$newDBName,
 
             # the account name to connect to
-            [Parameter(Mandatory=$true)]
+            [Parameter(ParameterSetName="accountName")]
             [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey,
-
-            # the URI string for the Cosmos DB instance
-            [Parameter()]
-            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+            [string]$primaryAccessKey
 
         )
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
 
         # build the URI
         $uri = $rootUri + '/dbs'
@@ -159,18 +198,26 @@ Param(
             [string]$dbName,
 
             # the account name to connect to
-            [Parameter(Mandatory=$true)]
+            [Parameter(ParameterSetName="accountName")]
             [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey,
+            [string]$primaryAccessKey
 
-            # the URI string for the Cosmos DB instance
-            [Parameter()]
-            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+        )
 
-        ) 
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
 
         # build the URI
         $uri = $rootUri + '/dbs/' + $dbname + '/colls'
@@ -197,21 +244,29 @@ Param(
             [string]$newCollectionName,
 
             # the account name to connect to
-            [Parameter(Mandatory=$true)]
+            [Parameter(ParameterSetName="accountName")]
             [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
             [string]$primaryAccessKey,
 
             # x-ms-offer-throughput needed to size the new collection
-            $xmsofferthroughput = '10000',
-
-            # the URI string for the Cosmos DB instance
-            [Parameter()]
-            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+            $xmsofferthroughput = '10000'
         )
-    
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
+
         # build the URI that we are sending the request to
         $uri = $rootUri + '/dbs/' + $DBName + '/colls'
         $resourceID = 'dbs/' +  $DBName
@@ -239,21 +294,29 @@ Param(
             [string]$collectionName,
 
             # the account name to connect to
-            [Parameter(Mandatory=$true)]
+            [Parameter(ParameterSetName="accountName")]
             [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
             [string]$primaryAccessKey,
 
             # maximum number of items to return
-            [int]$xmsmaxitemcount = 50,
-
-            # the URI string for the Cosmos DB instance
-            [Parameter()]
-            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+            [int]$xmsmaxitemcount = 50
 
         )
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
 
         # build the URI
         $uri = $rootUri + '/dbs/' + $dbname + '/colls/' + $collectionName + '/docs/'
@@ -285,21 +348,29 @@ Param(
             [string]$collectionName,
 
             # the account name to connect to
-            [Parameter(Mandatory=$true)]
+            [Parameter(ParameterSetName="accountName")]
             [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
             [string]$primaryAccessKey,
 
             # the JSON document to upload
-            [string]$document,
-
-            # the URI string for the Cosmos DB instance
-            [Parameter()]
-            [string]$rootUri =  'https://' + $accountName + '.documents.azure.com'
+            [string]$document
 
         )
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
 
         # build the URI that we are sending the request to
         $uri = $rootUri + '/dbs/' + $DBName + '/colls/' + $collectionName + '/docs'
