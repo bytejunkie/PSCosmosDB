@@ -109,6 +109,7 @@ Param(
     }
     
     function Get-CosmosDBDatabases{
+        #Todo: make the function get a single DB if requested.
         [CmdletBinding()]
         Param(
         
@@ -186,10 +187,12 @@ Param(
         $body = @{id=$newDBName} | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+        $response
     }
 
 
     function Get-CosmosDBCollections {
+        #Todo: make the function get a single DB if requested.
         [CmdletBinding()]
         Param(
         
@@ -279,6 +282,7 @@ Param(
         $body = @{id=$newCollectionName} | ConvertTo-Json
                
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+        $response
     }
 
     function Get-CosmosDBDocuments {
