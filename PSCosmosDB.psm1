@@ -157,9 +157,7 @@ Param(
             } else {
                 $response.Databases
         }
-
- 
-        Write-Host ("Found " + $Response.Databases.Count + " Database(s)")
+        #Write-Host ("Found " + $Response.Databases.Count + " Database(s)")
     }
 
     function New-CosmosDBDatabase {
