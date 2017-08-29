@@ -123,8 +123,12 @@ Param(
              
         # primary Access Key for the doc DB instance
         [Parameter(Mandatory=$true)]
-        [string]$primaryAccessKey
+        [string]$primaryAccessKey,
+        
+        # are we looking for a specific database or a list of them?
+        [string]$databaseName
         )
+
 
         # the URI string for the Cosmos DB instance
         # we need to work out if we're working against the emulator or the cloud
@@ -136,16 +140,30 @@ Param(
 
         # build the URI
         $uri = $rootUri + "/dbs"
-        write-host $uri
 
         # build the headers
         $headers = Get-Headers -resourceType dbs -primaryAccessKey $primaryAccessKey
- 
-        #write-host $uri
+
+        # issue the command
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers 
-        $response.Databases
- 
-        Write-Host ("Found " + $Response.Databases.Count + " Database(s)")
+        $databasesFound = $response.Databases.GetEnumerator() | sort-object id
+
+        if ($databaseName) {
+            # we are looking for a specific database name
+            
+            if ($databasesFound.id -like $databaseName) {
+                write-host "$databaseName found."
+                } else {
+                    write-host "$databaseName not Found"
+                }
+        } else {
+            # we're not looking for a specific database
+            Write-Host "Found $($Response._count) Database(s)"
+            
+            foreach ($df in $databasesFound) {
+                write-host $df.id
+            }
+        }
     }
 
     function New-CosmosDBDatabase {
@@ -187,7 +205,8 @@ Param(
         $body = @{id=$newDBName} | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
-        $response
+        write-host "$response.id created with rid $response._rid"
+        #$response._count
     }
 
 
