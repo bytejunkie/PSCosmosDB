@@ -153,16 +153,18 @@ Param(
             
             if ($databasesFound.id -like $databaseName) {
                 write-host "$databaseName found."
+                return "$databaseName found."
                 } else {
                     write-host "$databaseName not Found"
+                    return "$databaseName not Found"
                 }
         } else {
             # we're not looking for a specific database
             Write-Host "Found $($Response._count) Database(s)"
-            
             foreach ($df in $databasesFound) {
                 write-host $df.id
             }
+            return "Found $($Response._count) Database(s)"
         }
     }
 
