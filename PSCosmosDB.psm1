@@ -140,24 +140,30 @@ Param(
 
         # build the URI
         $uri = $rootUri + "/dbs"
-        write-host $uri
 
         # build the headers
         $headers = Get-Headers -resourceType dbs -primaryAccessKey $primaryAccessKey
- 
-        #write-host $uri
+
+        # issue the command
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers 
-        
+        $databasesFound = $response.Databases.GetEnumerator() | sort-object id
+
         if ($databaseName) {
-            if ($response.Databases -like $databaseName) {
+            # we are looking for a specific database name
+            
+            if ($databasesFound.id -like $databaseName) {
                 write-host "$databaseName found."
                 } else {
                     write-host "$databaseName not Found"
                 }
-            } else {
-                $response.Databases
+        } else {
+            # we're not looking for a specific database
+            Write-Host "Found $($Response._count) Database(s)"
+            
+            foreach ($df in $databasesFound) {
+                write-host $df.id
+            }
         }
-        #Write-Host ("Found " + $Response.Databases.Count + " Database(s)")
     }
 
     function New-CosmosDBDatabase {
@@ -199,7 +205,8 @@ Param(
         $body = @{id=$newDBName} | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
-        $response
+        write-host "$response.id created with rid $response._rid"
+        #$response._count
     }
 
 
