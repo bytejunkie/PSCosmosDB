@@ -146,25 +146,21 @@ Param(
 
         # issue the command
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers 
+        
+        # get the databases found to use later
         $databasesFound = $response.Databases.GetEnumerator() | sort-object id
-
         if ($databaseName) {
             # we are looking for a specific database name
-            
             if ($databasesFound.id -like $databaseName) {
                 write-host "$databaseName found."
-                return "$databaseName found."
+                return $databaseName
                 } else {
                     write-host "$databaseName not Found"
-                    return "$databaseName not Found"
                 }
         } else {
             # we're not looking for a specific database
             Write-Host "Found $($Response._count) Database(s)"
-            foreach ($df in $databasesFound) {
-                write-host $df.id
-            }
-            return "Found $($Response._count) Database(s)"
+            return $databasesFound.id
         }
     }
 

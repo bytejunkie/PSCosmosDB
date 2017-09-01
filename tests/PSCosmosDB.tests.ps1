@@ -4,6 +4,7 @@
 # You can download Pester from http://go.microsoft.com/fwlink/?LinkID=534084
 #
 
+
 Describe "Get-CosmosDBDatabases" {
     Context "Function Works" {
 
@@ -32,7 +33,20 @@ Describe "Get-CosmosDBDatabases" {
             {Get-CosmosDBDatabases @splat } | Should Not Be $null
         }
     }
+    Context "Call to Emulator works" {
+        
+                $splat = @{
+                    "emulatorAddress" = "https://172.18.168.172:8081/";
+                    "primaryAccessKey" = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+                    }
+        
+                It "Returns a result" {
+                    {Get-CosmosDBDatabases @splat } | Should Not Be $null
+                }
+            }
 }
+
+
 
 Describe "Get-CosmosDBCollections" {
     Context "The Function Works" {
