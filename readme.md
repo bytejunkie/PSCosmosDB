@@ -33,6 +33,11 @@ query away...
 Get-CosmosDatabases -AccountName $accountName -PrimaryAccessKey $primaryAccessKey
 ```
 
+### *NEW* check for a specific database
+```powershell
+Get-CosmosDatabases -AccountName $accountName -PrimaryAccessKey $primaryAccessKey -dbName $dbName
+```
+
 ### add a database
 ```powershell
 New-CosmosDBDatabase -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
