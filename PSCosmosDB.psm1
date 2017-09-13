@@ -248,9 +248,10 @@ Param(
         $headers = Get-Headers -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
         #write-host $uri
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
-        $response.Documentcollections
  
-       Write-Host ("Found " + $Response.DocumentCollections.Count + " Document collection(s)")
+        Write-Host ("Found " + $Response.DocumentCollections.Count + " Document collection(s)")
+        Write-Host $response.DocumentCollections.id
+
     }
 
     function New-CosmosDBCollection {
@@ -277,7 +278,11 @@ Param(
             [string]$primaryAccessKey,
 
             # x-ms-offer-throughput needed to size the new collection
-            $xmsofferthroughput = '400'
+            [Parameter()]
+            $xmsofferthroughput = '400',
+
+            [Parameter()]
+            $timeToLive = '-1'
         )
 
         # the URI string for the Cosmos DB instance
@@ -297,10 +302,10 @@ Param(
         $headers.Add("x-ms-offer-throughput",$xmsofferthroughput)
 
         # when creating a db need to put the id into a document body. 
-        $body = @{id=$newCollectionName} | ConvertTo-Json
+        $body = @{id=$newCollectionName; defaultTtl = $timeToLive} | ConvertTo-Json
                
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
-        $response
+        $response.id
     }
 
     function Get-CosmosDBDocuments {
