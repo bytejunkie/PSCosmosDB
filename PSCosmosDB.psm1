@@ -296,6 +296,7 @@ Param(
         # build the URI that we are sending the request to
         $uri = $rootUri + '/dbs/' + $DBName + '/colls'
         $resourceID = 'dbs/' +  $DBName
+
         # build the headers
         $headers = Get-Headers -action Post -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
         # add in the sizing variable
