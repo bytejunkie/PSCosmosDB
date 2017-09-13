@@ -303,7 +303,7 @@ Param(
         $headers.Add("x-ms-offer-throughput",$xmsofferthroughput)
 
         # when creating a db need to put the id into a document body. 
-        $body = @{id=$newCollectionName; defaultTtl = $timeToLive} | ConvertTo-Json
+        $body = @{id=$newCollectionName;} | ConvertTo-Json
                
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
         $response.id
