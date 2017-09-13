@@ -277,7 +277,7 @@ Param(
             [string]$primaryAccessKey,
 
             # x-ms-offer-throughput needed to size the new collection
-            $xmsofferthroughput = '10000'
+            $xmsofferthroughput = '400'
         )
 
         # the URI string for the Cosmos DB instance
