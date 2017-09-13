@@ -204,7 +204,8 @@ Param(
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
         write-host "$response.id created with rid $response._rid"
-        #$response._count
+        $response
+        return $response.id
     }
 
 

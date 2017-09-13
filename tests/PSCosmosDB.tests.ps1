@@ -36,7 +36,7 @@ Describe "Get-CosmosDBDatabases" {
     Context "Call to Emulator works" {
         
                 $splat = @{
-                    "emulatorAddress" = "https://172.18.168.172:8081/";
+                    "emulatorAddress" = "https://172.18.167.172:8081/";
                     "primaryAccessKey" = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
                     }
         
