@@ -1,3 +1,4 @@
+$ErrorActionPreference = 'stop'
 
 function New-AuthToken {
 
@@ -145,7 +146,7 @@ Param(
         $headers = Get-Headers -resourceType dbs -primaryAccessKey $primaryAccessKey
 
         # issue the command
-        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers 
+        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
         
         # get the databases found to use later
         $databasesFound = $response.Databases.GetEnumerator() | sort-object id
