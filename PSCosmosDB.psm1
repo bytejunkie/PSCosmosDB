@@ -350,8 +350,10 @@ Param(
             [string]$primaryAccessKey,
 
             # maximum number of items to return
-            [int]$xmsmaxitemcount = 50
+            [int]$xmsmaxitemcount = 50,
 
+            # document id if looking for a single document
+            [string]$documentID
         )
 
         # the URI string for the Cosmos DB instance
@@ -373,10 +375,22 @@ Param(
         #write-host $uri
         #write-host $resourceID
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
-        $response.Documents
  
-        Write-Host ("Found " + $Response.Documents.Count + " Document(s)")
-    
+        # get the databases found to use later
+        $documentsFound = $response.Documents.GetEnumerator() | sort-object id
+        if ($documentId) {
+            # we are looking for a specific database name
+            if ($documentsFound.id -like $documentId) {
+                write-host "$documentId found."
+                return $documentId
+                } else {
+                    write-host "$documentId not Found"
+                }
+            } else {
+            # we're not looking for a specific database
+            Write-Host "Found $($Response._count) Document(s)"
+            return $documentsFound.id
+        }    
     }
 
     function New-CosmosDBDocument {
@@ -426,5 +440,5 @@ Param(
         $headers.Add("x-ms-documentdb-is-upsert", "true")
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $document -ContentType 'application/json'
-        
+        write-host "Upserted document with id $($response.id)"
     }

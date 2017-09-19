@@ -53,7 +53,8 @@ Get-CosmosDBCollections -AccountName $accountName -PrimaryAccessKey $primaryAcce
 ### *NEW* check for a specific collection
 ```powershell
 Get-CosmosDBCollections -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
-                            -DBName <insert_db_name_here>
+                            -DBName <insert_db_name_here> `
+                            -collectionName <insert_collection_name_here> 
 ```
 
 ### add a collection
@@ -70,6 +71,14 @@ Get-CosmosDBDocuments -AccountName $accountName -PrimaryAccessKey $primaryAccess
                             -DBName <insert_db_name_here> `
                             -CollectionName <insert_collection_name_here> `
                             -xmsmaxitemcount <insert_max_item_count_here>
+```
+
+### *New* check for a specific document
+```powershell
+Get-CosmosDBDocuments -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -CollectionName <insert_collection_name_here> `
+                            -documentId <insert_documentId_here>
 ```
 
 ### add a document
