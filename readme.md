@@ -49,6 +49,13 @@ New-CosmosDBDatabase -AccountName $accountName -PrimaryAccessKey $primaryAccessK
 Get-CosmosDBCollections -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
                             -DBName <insert_db_name_here>
 ```
+
+### *NEW* check for a specific collection
+```powershell
+Get-CosmosDBCollections -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here>
+```
+
 ### add a collection
 ```powershell
 New-CosmosDBCollection -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `

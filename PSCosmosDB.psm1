@@ -253,7 +253,7 @@ Param(
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
  
         # get the databases found to use later
-        $collectionsFound = $response.Collections.GetEnumerator() | sort-object id
+        $collectionsFound = $response.DocumentCollections.GetEnumerator() | sort-object id
         if ($collectionName) {
             # we are looking for a specific database name
             if ($collectionsFound.id -like $collectionName) {
