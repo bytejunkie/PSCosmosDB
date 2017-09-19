@@ -70,11 +70,23 @@ Describe "Get-CosmosDBCollections" {
         } -Verifiable
 
         $splat = @{
-            "uri" = "database01";
+            "uri" = "collection01";
             "method" = 'get';
             }
 
         It "Returns a result" {
+            {Get-CosmosDBCollections @splat } | Should Not Be $null
+        }
+
+        $splat = @{
+            "uri" = "collection01";
+            "method" = 'get';
+            }
+            
+        It "Returns a collection which exists" {
+            {Get-CosmosDBCollections @splat } | Should Not Be $null
+        }
+        It "Returns a negative when the collection doesn't exist" {
             {Get-CosmosDBCollections @splat } | Should Not Be $null
         }
     }

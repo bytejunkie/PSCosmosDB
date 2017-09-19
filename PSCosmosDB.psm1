@@ -130,7 +130,6 @@ Param(
         [string]$databaseName
         )
 
-
         # the URI string for the Cosmos DB instance
         # we need to work out if we're working against the emulator or the cloud
         if ($emulatorAddress) { 
@@ -229,7 +228,10 @@ Param(
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey
+            [string]$primaryAccessKey,
+
+            # are we looking for a specific database or a list of them?
+            [string]$collectionName
 
         )
 
@@ -250,8 +252,21 @@ Param(
         #write-host $uri
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
  
-        Write-Host ("Found " + $Response.DocumentCollections.Count + " Document collection(s)")
-        Write-Host $response.DocumentCollections.id
+        # get the databases found to use later
+        $collectionsFound = $response.Collections.GetEnumerator() | sort-object id
+        if ($collectionName) {
+            # we are looking for a specific database name
+            if ($collectionsFound.id -like $collectionName) {
+                write-host "$collectionName found."
+                return $collectionName
+                } else {
+                    write-host "$collectionName not Found"
+                }
+        } else {
+            # we're not looking for a specific database
+            Write-Host "Found $($Response._count) Collection(s)"
+            return $collectionsFound.id
+        }
 
     }
 
