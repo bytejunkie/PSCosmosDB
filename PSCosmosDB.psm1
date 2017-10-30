@@ -53,7 +53,7 @@ Param(
         [System.Web.HttpUtility]::UrlEncode($('type=master&ver=1.0&sig=' + $signature))
     }
  
-    function Get-UTDate() {
+    function Get-UTDate {
         $date = get-date
         $date = $date.ToUniversalTime()
         return $date.ToString("ddd, dd MMM yyyy HH:mm:ss \G\M\T")
@@ -203,9 +203,11 @@ Param(
         $body = @{id=$newDBName} | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
-        write-host "$response.id created with rid $response._rid"
-        $response
-        return $response.id
+        #write-host "$response.id created with rid $response._rid"
+        if ($response.id -like $newDBName) {
+            Write-Host "Database created with id $($response.id)"
+        }
+        return $response
     }
 
 
