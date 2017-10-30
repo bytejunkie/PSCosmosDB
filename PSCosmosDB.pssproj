@@ -7,7 +7,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>
-    <Name>PSDocumentDB</Name>
+    <Name>PSCosmosDB</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="PSDocumentDB.psd1" />
-    <Compile Include="PSDocumentDB.psm1" />
-    <Compile Include="PSDocumentDB.tests.ps1" />
+    <Compile Include="PSCosmosDB.psd1" />
+    <Compile Include="PSCosmosDB.psm1" />
+    <Compile Include="tests\PSCosmosDB.tests.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
