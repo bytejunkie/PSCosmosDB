@@ -153,9 +153,10 @@ Param(
             # we are looking for a specific database name
             if ($databasesFound.id -like $databaseName) {
                 write-host "$databaseName found."
-                return $databaseName
+                return $true
                 } else {
                     write-host "$databaseName not Found"
+                    return $false
                 }
         } else {
             # we're not looking for a specific database
@@ -260,9 +261,10 @@ Param(
             # we are looking for a specific database name
             if ($collectionsFound.id -like $collectionName) {
                 write-host "$collectionName found."
-                return $collectionName
+                return $true
                 } else {
                     write-host "$collectionName not Found"
+                    return $false
                 }
         } else {
             # we're not looking for a specific database
@@ -384,9 +386,10 @@ Param(
             # we are looking for a specific database name
             if ($documentsFound.id -like $documentId) {
                 write-host "$documentId found."
-                return $documentId
+                return $true
                 } else {
                     write-host "$documentId not Found"
+                    return $false
                 }
             } else {
             # we're not looking for a specific database

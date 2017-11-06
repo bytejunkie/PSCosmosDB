@@ -1,4 +1,4 @@
-$emulatorAddress = 'https://172.19.28.181:8081'
+$emulatorAddress = 'https://172.18.171.78:8081'
 $PrimaryAccessKey = 'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=='
 
 push-location C:\Source\PSCosmosDB
@@ -7,7 +7,7 @@ Remove-Module PSCosmosDB
 import-module .\PSCosmosDB.psd1 -force -Verbose
 
 Get-CosmosDBDatabases -emulatorAddress $emulatorAddress -primaryAccessKey $PrimaryAccessKey
-Get-CosmosDBDatabases -emulatorAddress $emulatorAddress -primaryAccessKey $PrimaryAccessKey -databaseName 'mattshort05'
+Get-CosmosDBDatabases -emulatorAddress $emulatorAddress -primaryAccessKey $PrimaryAccessKey -databaseName 'mattshort04'
 Get-CosmosDBDatabases -emulatorAddress $emulatorAddress -primaryAccessKey $PrimaryAccessKey -databaseName 'mattshort08'
 New-CosmosDBDatabase -emulatorAddress $emulatorAddress -primaryAccessKey $PrimaryAccessKey -newdbName 'mattshort04'
 
