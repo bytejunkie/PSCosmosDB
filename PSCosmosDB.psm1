@@ -302,7 +302,7 @@ Param(
             $xmsofferthroughput = '400',
 
             [Parameter()]
-            $timeToLive = '-1'
+            [int]$defaultCollectionTTL
         )
 
         # the URI string for the Cosmos DB instance
@@ -323,7 +323,11 @@ Param(
         $headers.Add("x-ms-offer-throughput",$xmsofferthroughput)
 
         # when creating a db need to put the id into a document body. 
-        $body = @{id=$newCollectionName;} | ConvertTo-Json
+        if ($defaultCollectionTTL) {
+            $body = @{id=$newCollectionName;defaultTtl=$defaultCollectionTTL} | ConvertTo-Json
+            } else {
+                $body = @{id=$newCollectionName} | ConvertTo-Json
+        }
                
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
         $response.id
