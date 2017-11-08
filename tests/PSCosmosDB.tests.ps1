@@ -5,26 +5,38 @@ $ModulePath
 
 Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
 
-$mydbaccount = 'euablddvcdb001'
-$primaryAccessKey = 'NTLl8NWZEkE4VKgGStrWKupysFEyJlxWnFDf9nGOpQt3xEYnEeOrWJfe3JpY4kL8GfJx7WcNRYN5GGjqYWvRzA=='
+$config = Get-Content .\config.json | ConvertFrom-Json
+
+$mydbaccount = $config.accountName
+$resourceGroupName = $config.ResourceGroupName
+$keys = Invoke-AzureRmResourceAction -Action listKeys `
+                                     -ResourceType "Microsoft.DocumentDb/databaseAccounts" `
+                                    -ApiVersion "2015-04-08" `
+                                    -ResourceGroupName $resourceGroupName `
+                                    -Name $myDbAccount.toLower() `
+                                    -Force -ErrorAction Stop
+                                    
+$primaryMasterKey = $keys.primaryMasterKey
+
+$splat = @{
+    "accountName" = $mydbaccount
+    "primaryMasterKey" = $primaryMasterKey
+}
+
 
 Describe "Get-CosmosDBDatabase" {
 
     Context "Get-CosmosDBDatabases connects to account, returns info" {
-        $splat = @{
-            "accountName" = "euablddvcdb001"
-            "primaryAccessKey" = "NTLl8NWZEkE4VKgGStrWKupysFEyJlxWnFDf9nGOpQt3xEYnEeOrWJfe3JpY4kL8GfJx7WcNRYN5GGjqYWvRzA=="
-        }
 
-        #New-cosmosdbDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -dbname 'database01'
+        #New-cosmosdbDatabase -accountName $mydbaccount -primaryAccessKey $primaryMasterKey -dbname 'database01'
         #New-cosmosdbDatabase @splat -dbname 'database02'
     
         It "returns databases" {
-            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey | Should not be null
+            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryMasterKey | Should not be null
             }
         
         It "returns a single database" {
-            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -dbname 'database01' | Should not be $False
+            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryMasterKey -dbname 'database01' | Should not be $False
         }
     }
 }
@@ -33,10 +45,10 @@ Describe "New-CosmosDBDatabase" {
 
     Context "New-CosmosDBDatabase creates a database" {
 
-        #New-cosmosdbDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -dbname 'database03'
+        #New-cosmosdbDatabase -accountName $mydbaccount -primaryAccessKey $primaryMasterKey -dbname 'database03'
 
         It "created a database" {
-            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -DBName 'database03' | Should not be $False
+            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryMasterKey -DBName 'database03' | Should not be $False
         }
 
 
