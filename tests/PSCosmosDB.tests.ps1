@@ -1,93 +1,44 @@
-#
-# This is a PowerShell Unit Test file.
-# You need a unit test framework such as Pester to run PowerShell Unit tests.
-# You can download Pester from http://go.microsoft.com/fwlink/?LinkID=534084
-#
+$here = (Split-Path -Parent $MyInvocation.MyCommand.Path) -replace '\\Tests', ''
+$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
+$ModulePath = "$here\$sut" -replace 'ps1', 'psd1'
+$ModulePath
 
+Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
 
-Describe "Get-CosmosDBDatabases" {
-    Context "Function Works" {
+$mydbaccount = 'euablddvcdb001'
+$primaryAccessKey = 'NTLl8NWZEkE4VKgGStrWKupysFEyJlxWnFDf9nGOpQt3xEYnEeOrWJfe3JpY4kL8GfJx7WcNRYN5GGjqYWvRzA=='
 
-        $returns = @{
-            "id" = "database01";
-            "_rid" = '2bkRAA==';
-            "_self" = "dbs/2bkRAA==";
-            "_etag" = "0000fd00-0000-0000-0000-58f9f907000";
-            "_colls" = "colls/";
-            "_users" = "users/";
-            "_ts" = "1492777222";
+Describe "Get-CosmosDBDatabase" {
+
+    Context "Get-CosmosDBDatabases connects to account, returns info" {
+        $splat = @{
+            "accountName" = "euablddvcdb001"
+            "primaryAccessKey" = "NTLl8NWZEkE4VKgGStrWKupysFEyJlxWnFDf9nGOpQt3xEYnEeOrWJfe3JpY4kL8GfJx7WcNRYN5GGjqYWvRzA=="
         }
 
-        Mock Invoke-RestMethod {
-            param($uri, $method)
-            return $returns
-
-        } -Verifiable
-
-        $splat = @{
-            "uri" = "database01";
-            "method" = 'get';
+        #New-cosmosdbDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -dbname 'database01'
+        #New-cosmosdbDatabase @splat -dbname 'database02'
+    
+        It "returns databases" {
+            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey | Should not be null
             }
-
-        It "Returns a result" {
-            {Get-CosmosDBDatabases @splat } | Should Not Be $null
+        
+        It "returns a single database" {
+            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -dbname 'database01' | Should not be $False
         }
     }
-    Context "Call to Emulator works" {
-        
-                $splat = @{
-                    "emulatorAddress" = "https://172.18.167.172:8081/";
-                    "primaryAccessKey" = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-                    }
-        
-                It "Returns a result" {
-                    {Get-CosmosDBDatabases @splat } | Should Not Be $null
-                }
-            }
 }
 
+Describe "New-CosmosDBDatabase" {
 
+    Context "New-CosmosDBDatabase creates a database" {
 
-Describe "Get-CosmosDBCollections" {
-    Context "The Function Works" {
-        $returns = @{
-            "id" = "mattshortCollection3";
-            "_rid" = "OIFDAPmD0QA=";
-            "_ts" = "1503868413";
-            "_self" = "dbs/OIFDAA==/colls/OIFDAPmD0QA=/";
-            "_etag" = "00001500-0000-0000-0000-59a335fd0000";
-            "_docs" = "docs/";
-            "_sprocs" = "sprocs/";
-            "_triggers" = "triggers/";
-            "_udfs" = "udfs/";
-            "_conflicts" = "conflicts/";
+        #New-cosmosdbDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -dbname 'database03'
+
+        It "created a database" {
+            Get-CosmosDBDatabase -accountName $mydbaccount -primaryAccessKey $primaryAccessKey -DBName 'database03' | Should not be $False
         }
 
-        Mock Invoke-RestMethod {
-            param($uri, $method)
-            return $returns
 
-        } -Verifiable
-
-        $splat = @{
-            "uri" = "collection01";
-            "method" = 'get';
-            }
-
-        It "Returns a result" {
-            {Get-CosmosDBCollections @splat } | Should Not Be $null
-        }
-
-        $splat = @{
-            "uri" = "collection01";
-            "method" = 'get';
-            }
-            
-        It "Returns a collection which exists" {
-            {Get-CosmosDBCollections @splat } | Should Not Be $null
-        }
-        It "Returns a negative when the collection doesn't exist" {
-            {Get-CosmosDBCollections @splat } | Should Not Be $null
-        }
     }
 }

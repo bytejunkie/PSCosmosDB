@@ -92,14 +92,13 @@ Param(
             # the emulatorAddress to connect to
             [Parameter(ParameterSetName="emulatorAddress")]
             [string]$emulatorAddress, 
-
-                    
-            # primary Access Key for the doc DB instance
-            [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey
+        
+            # the account name to connect to
+            [Parameter(ParameterSetName="accountName")]
+            [string]$accountName
         )
 
-                # the URI string for the Cosmos DB instance
+        # the URI string for the Cosmos DB instance
         # we need to work out if we're working against the emulator or the cloud
         if ($emulatorAddress) { 
             $rootUri = $emulatorAddress
@@ -109,8 +108,7 @@ Param(
         return $rootUri
     }
     
-    function Get-CosmosDBDatabases{
-        #Todo: make the function get a single DB if requested.
+    function Get-CosmosDBDatabase{
         [CmdletBinding()]
         Param(
         
@@ -127,15 +125,15 @@ Param(
         [string]$primaryAccessKey,
         
         # are we looking for a specific database or a list of them?
-        [string]$databaseName
+        [string]$DBName
         )
 
         # the URI string for the Cosmos DB instance
         # we need to work out if we're working against the emulator or the cloud
         if ($emulatorAddress) { 
-            $rootUri = $emulatorAddress
+            $rootUri = Get-RootURI -emulatorAddress $emulatorAddress
             } else {
-                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+                $rootUri = Get-RootURI -accountName $accountName
             }
 
         # build the URI
@@ -149,13 +147,13 @@ Param(
         
         # get the databases found to use later
         $databasesFound = $response.Databases.GetEnumerator() | sort-object id
-        if ($databaseName) {
+        if ($DBName) {
             # we are looking for a specific database name
-            if ($databasesFound.id -like $databaseName) {
-                write-host "$databaseName found."
+            if ($databasesFound.id -like $DBName) {
+                write-host "$DBName found."
                 return $true
                 } else {
-                    write-host "$databaseName not Found"
+                    write-host "$DBName not Found"
                     return $false
                 }
         } else {
@@ -171,7 +169,7 @@ Param(
         
             # the dbName to add
             [Parameter(Mandatory=$true)]
-            [string]$newDBName,
+            [string]$DBName,
 
             # the account name to connect to
             [Parameter(ParameterSetName="accountName")]
@@ -186,13 +184,15 @@ Param(
             [string]$primaryAccessKey
 
         )
+
         # the URI string for the Cosmos DB instance
         # we need to work out if we're working against the emulator or the cloud
         if ($emulatorAddress) { 
-            $rootUri = $emulatorAddress
+            $rootUri = Get-RootURI -emulatorAddress $emulatorAddress
             } else {
-                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+                $rootUri = Get-RootURI -accountName $accountName
             }
+
 
         # build the URI
         $uri = $rootUri + '/dbs'
@@ -201,25 +201,24 @@ Param(
         $headers = Get-Headers -action Post -resourceType dbs -primaryAccessKey $primaryAccessKey
 
         # when creating a db need to put the id into a document body. 
-        $body = @{id=$newDBName} | ConvertTo-Json
+        $body = @{id=$DBName} | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
         #write-host "$response.id created with rid $response._rid"
-        if ($response.id -like $newDBName) {
+        if ($response.id -like $DBName) {
             Write-Host "Database created with id $($response.id)"
         }
         return $response
     }
 
 
-    function Get-CosmosDBCollections {
-        #Todo: make the function get a single DB if requested.
+    function Get-CosmosDBCollection {
         [CmdletBinding()]
         Param(
         
             # the dbName to be querying for collections
             [Parameter(Mandatory=$true)]
-            [string]$dbName,
+            [string]$DBName,
 
             # the account name to connect to
             [Parameter(ParameterSetName="accountName")]
@@ -333,7 +332,7 @@ Param(
         $response.id
     }
 
-    function Get-CosmosDBDocuments {
+    function Get-CosmosDBDocument {
         [CmdletBinding()]
         Param(    
 
