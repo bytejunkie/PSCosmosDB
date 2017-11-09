@@ -211,6 +211,43 @@ Param(
         return $response
     }
 
+    function Remove-CosmosDBDatabase {
+        [CmdletBinding()]
+        Param(
+        
+            # the dbName to be querying for collections
+            [Parameter(Mandatory=$true)]
+            [string]$DBName,
+
+            # the account name to connect to
+            [Parameter(ParameterSetName="accountName")]
+            [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
+
+            # primary Access Key for the doc DB instance
+            [Parameter(Mandatory=$true)]
+            [string]$primaryAccessKey
+        )
+
+        if ($emulatorAddress) { 
+            $rootUri = Get-RootURI -emulatorAddress $emulatorAddress
+            } else {
+                $rootUri = Get-RootURI -accountName $accountName
+            }
+
+        # build the URI
+        $uri = $rootUri + '/dbs/' + $dbName
+        $resourceID = 'dbs/' + $dbname
+
+        # build the headers
+        $headers = Get-Headers -action Delete -resourceType dbs -resourceId $resourceID -primaryAccessKey $primaryAccessKey
+
+        $response = Invoke-RestMethod -Uri $uri -Method Delete -Headers $headers
+        write-host $response
+    }
 
     function Get-CosmosDBCollection {
         [CmdletBinding()]
