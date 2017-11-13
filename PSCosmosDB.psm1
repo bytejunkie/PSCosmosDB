@@ -365,9 +365,33 @@ Param(
         # add in the sizing variable
         $headers.Add("x-ms-offer-throughput",$xmsofferthroughput)
 
+		$indexObject = @{
+        indexingMode = 'Consistent';
+        automatic = $true;
+        includedPaths = @( @{
+            path = "/*";
+            indexes = @(
+                @{
+                    kind = "Range";
+                    dataType = "Number";
+                    precision = -1
+                  },
+                @{
+                    kind = "Range";
+                    dataType = "String";
+                    precision = -1
+                },
+                @{
+                    kind = "Spatial";
+                    dataType = "Point"
+                }
+            )
+        });
+        }
+
         # when creating a db need to put the id into a document body. 
         if ($defaultCollectionTTL) {
-            $body = @{id=$newCollectionName;defaultTtl=$defaultCollectionTTL} | ConvertTo-Json
+            $body = @{id=$newCollectionName;defaultTtl=$defaultCollectionTTL;indexingPolicy=$indexObject} | ConvertTo-Json
             } else {
                 $body = @{id=$newCollectionName} | ConvertTo-Json
         }
