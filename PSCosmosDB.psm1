@@ -125,7 +125,10 @@ Param(
         [string]$primaryAccessKey,
         
         # are we looking for a specific database or a list of them?
-        [string]$DBName
+        [string]$DBName,
+
+        # have we been asked for more info
+        [switch]$moreinfo = $false
         )
 
         # the URI string for the Cosmos DB instance
@@ -159,7 +162,11 @@ Param(
         } else {
             # we're not looking for a specific database
             Write-Host "Found $($Response._count) Database(s)"
-            return $databasesFound.id
+            if ($moreinfo) {
+                return $databasesFound
+                }else{
+                return $databasesFound.id
+            }
         }
     }
 
