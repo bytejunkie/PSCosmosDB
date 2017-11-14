@@ -326,7 +326,7 @@ Param(
 
             # the collection to add the db to
             [Parameter(Mandatory=$true)]
-            [string]$newCollectionName,
+            [string]$CollectionName,
 
             # the account name to connect to
             [Parameter(ParameterSetName="accountName")]
