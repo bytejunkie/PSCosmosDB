@@ -365,7 +365,8 @@ Param(
         # add in the sizing variable
         $headers.Add("x-ms-offer-throughput",$xmsofferthroughput)
 
-		$indexObject = @{
+        <#
+        $indexObject = @{
         indexingMode = 'Consistent';
         automatic = $true;
         includedPaths = @( @{
@@ -388,16 +389,66 @@ Param(
             )
         });
         }
+        #>
 
         # when creating a db need to put the id into a document body. 
+        $body = @{id=$CollectionName} | ConvertTo-Json
         if ($defaultCollectionTTL) {
-            $body = @{id=$newCollectionName;defaultTtl=$defaultCollectionTTL;indexingPolicy=$indexObject} | ConvertTo-Json
-            } else {
-                $body = @{id=$newCollectionName} | ConvertTo-Json
+            $body.Add('defaultTtl', $defaultCollectionTTL)
         }
-               
+        $JsonBody = $body | ConvertTo-Json
+
+        Write-Host $uri
+        write-host $resourceID
+
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
         $response.id
+    }
+
+    function Remove-CosmosDBCollection {
+        [CmdletBinding()]
+        Param(
+        
+            # the dbName to be querying for collections
+            [Parameter(Mandatory=$true)]
+            [string]$DBName,
+
+            # the account name to connect to
+            [Parameter(ParameterSetName="accountName")]
+            [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
+
+            # primary Access Key for the doc DB instance
+            [Parameter(Mandatory=$true)]
+            [string]$primaryAccessKey,
+
+            # the collection name we are looking to remove
+            [string]$collectionName
+
+        )
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
+
+        # build the URI
+        $uri = $rootUri + '/dbs/' + $dbname + '/colls'
+        $resourceID = 'dbs/' + $dbname
+
+        # build the headers
+        $headers = Get-Headers -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+        #write-host $uri
+        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+        $response
+
+
     }
 
     function Get-CosmosDBDocument {
