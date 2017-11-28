@@ -63,12 +63,18 @@ Describe "New-CosmosDBCollection" {
         It "creates a new Cosmos DB Collection" {
             for ($i = 1; $i -lt 5; $i++) {
                 $collectionName =  ("collection{0:N}" -f $i.ToString("000")) 
-                write-host $collectionName
                 New-CosmosDBCollection @splat -CollectionName $collectionName
-                start-sleep -Seconds 5
-                #Get-CosmosDBCollection @splat | should not be $false
+                
             }
-            
+            for ($i = 1; $i -lt 5; $i++) {
+                $collectionName =  ("collection{0:N}" -f $i.ToString("000")) 
+                Get-CosmosDBCollection @splat  -CollectionName $collectionName | should not be $false
+            }
+        }
+
+        It "creates a collection with ttl" {
+            New-CosmosDBCollection @splat -CollectionName 'collection06' -defaultCollectionTTL '19080'
+            (Get-CosmosDBCollection @splat -CollectionName 'collection06').defaultTTL | Should Not benullorempty
         }
     }
 
@@ -78,14 +84,14 @@ Describe "New-CosmosDBCollection" {
         }
 
         It "returns a single collection" {
-            Get-CosmosDBCollection @splat -CollectionName "collection0" | Should Be $true
+            Get-CosmosDBCollection @splat -CollectionName "collection4" | Should Be $true
         }
     }
 
     Context "removes DB Collections" {
         It "removes a collection" {
-            #Remove-CosmosDBCollection @splat -CollectionName "collection0" 
-            #Get-CosmosDBCollection @splat -CollectionName "collection0" | Should Be $false
+            Remove-CosmosDBCollection @splat -CollectionName "collection1" 
+            Get-CosmosDBCollection @splat -CollectionName "collection1" | Should Be $false
         }
     }
 

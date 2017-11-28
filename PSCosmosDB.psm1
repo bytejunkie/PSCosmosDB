@@ -277,8 +277,11 @@ Param(
             [string]$primaryAccessKey,
 
             # are we looking for a specific database or a list of them?
-            [string]$collectionName
+            [string]$collectionName,
 
+            # have we been asked for more info
+            [switch]$moreinfo = $false
+    
         )
 
         # the URI string for the Cosmos DB instance
@@ -312,7 +315,11 @@ Param(
         } else {
             # we're not looking for a specific database
             Write-Host "Found $($Response._count) Collection(s)"
-            return $collectionsFound.id
+            if ($moreinfo) {
+                return $collectionsFound
+                }else{
+                return $collectionsFound.id
+            }
         }
 
     }
@@ -365,43 +372,42 @@ Param(
         # add in the sizing variable
         $headers.Add("x-ms-offer-throughput",$xmsofferthroughput)
 
-        <#
+        # create a default indexing pattern
         $indexObject = @{
-        indexingMode = 'Consistent';
-        automatic = $true;
-        includedPaths = @( @{
-            path = "/*";
-            indexes = @(
-                @{
-                    kind = "Range";
-                    dataType = "Number";
-                    precision = -1
-                  },
-                @{
-                    kind = "Range";
-                    dataType = "String";
-                    precision = -1
-                },
-                @{
-                    kind = "Spatial";
-                    dataType = "Point"
-                }
-            )
-        });
+            indexingMode = 'Consistent';
+            automatic = $true;
+            includedPaths = @( @{
+                path = "/*";
+                indexes = @(
+                    @{
+                        kind = "Range";
+                        dataType = "Number";
+                        precision = -1
+                    },
+                    @{
+                        kind = "Range";
+                        dataType = "String";
+                        precision = -1
+                    },
+                    @{
+                        kind = "Spatial";
+                        dataType = "Point"
+                    }
+                )
+            });
         }
-        #>
 
         # when creating a db need to put the id into a document body. 
-        $body = @{id=$CollectionName} | ConvertTo-Json
-        if ($defaultCollectionTTL) {
-            $body.Add('defaultTtl', $defaultCollectionTTL)
+        $body = @{
+            id=$CollectionName;
+            indexingPolicy=$indexObject
         }
-        $JsonBody = $body | ConvertTo-Json
+        
+        if ($defaultCollectionTTL) { $body.Add('defaultTtl', $defaultCollectionTTL) }
 
-        Write-Host $uri
-        write-host $resourceID
+        $JsonBody = $body | ConvertTo-Json -Depth 10
 
-        $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+        $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $JsonBody
         $response.id
     }
 
