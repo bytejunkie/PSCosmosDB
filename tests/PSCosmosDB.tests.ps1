@@ -78,23 +78,24 @@ Describe "New-CosmosDBCollection" {
         }
     }
 
-    Context "returns DB Collections" {
+    Context "Get-CosmosDBCollection" {
         It "returns collections" {
             (Get-CosmosDBCollection @splat).count | should BeGreaterThan 0
         }
 
         It "returns a single collection" {
-            Get-CosmosDBCollection @splat -CollectionName "collection4" | Should Be $true
+            Get-CosmosDBCollection @splat -CollectionName "collection004" | Should Be $true
         }
     }
 
-    Context "removes DB Collections" {
+    Context "Remove-CosmosDBCollection" {
         It "removes a collection" {
-            Remove-CosmosDBCollection @splat -CollectionName "collection1" 
-            Get-CosmosDBCollection @splat -CollectionName "collection1" | Should Be $false
+            Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
+            Remove-CosmosDBCollection @splat -CollectionName "collection002" 
+            Get-CosmosDBCollection @splat -CollectionName "collection002" | Should Be $false
         }
     }
 
     # need to remove the db we created to work on
-    Remove-cosmosdbDatabase @splat
+    #Remove-cosmosdbDatabase @splat
 }

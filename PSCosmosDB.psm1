@@ -445,13 +445,13 @@ Param(
             }
 
         # build the URI
-        $uri = $rootUri + '/dbs/' + $dbname + '/colls'
+        $uri = $rootUri + '/dbs/' + $dbname + '/colls' + $collectionName
         $resourceID = 'dbs/' + $dbname
 
         # build the headers
-        $headers = Get-Headers -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+        $headers = Get-Headers -action Delete -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey
         #write-host $uri
-        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+        $response = Invoke-RestMethod -Uri $uri -Method Delete -Headers $headers
         $response
 
 
