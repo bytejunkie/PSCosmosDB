@@ -6,22 +6,26 @@ Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
 
 $config = Get-Content "$here\tests\config.json" | ConvertFrom-Json
 
-$mydbaccount = $config.accountName
-$resourceGroupName = $config.ResourceGroupName
-$keys = Invoke-AzureRmResourceAction -Action listKeys `
-                                     -ResourceType "Microsoft.DocumentDb/databaseAccounts" `
-                                    -ApiVersion "2015-04-08" `
-                                    -ResourceGroupName $resourceGroupName `
-                                    -Name $myDbAccount.toLower() `
-                                    -Force -ErrorAction Stop
-                                    
-$primaryAccessKey = $keys.primaryMasterKey
+$splat = @{}
 
-$splat = @{
-    "accountName" = $mydbaccount
-    "primaryAccessKey" = $primaryAccessKey
+if ($config.emulatorAddress) {
+    $splat.Add("emulatorAddress", $config.emulatorAddress)
+} else {
+    $splat.Add('mydbaccount', $config.accountName)
 }
 
+if ($config.primaryAccessKey) {
+    $splat.Add("primaryAccessKey", $config.primaryAccessKey)
+} else {
+    $keys = Invoke-AzureRmResourceAction -Action listKeys `
+                                        -ResourceType "Microsoft.DocumentDb/databaseAccounts" `
+                                        -ApiVersion "2015-04-08" `
+                                        -ResourceGroupName $resourceGroupName `
+                                        -Name $myDbAccount.toLower() `
+                                        -Force -ErrorAction Stop
+    $splat.Add("primaryAccessKey", $keys.primaryMasterKey)
+}
+if ($config.ResourceGroupName) { $splat.Add('resourceGroupName', $config.ResourceGroupName)}
 
 Describe "CosmosDB Database Commands" {
 

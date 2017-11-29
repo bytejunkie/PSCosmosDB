@@ -397,6 +397,7 @@ Param(
             });
         }
 
+
         # when creating a db need to put the id into a document body. 
         $body = @{
             id=$CollectionName;
@@ -404,6 +405,13 @@ Param(
         }
         
         if ($defaultCollectionTTL) { $body.Add('defaultTtl', $defaultCollectionTTL) }
+        if ($partitionKey) {
+            $partitionKeyObject = @{
+                "paths" = $partitionKey;
+                "kind" = 'hash';
+            }
+            $body.Add('partitionKey', $partitionKeyObject)
+        } 
 
         $JsonBody = $body | ConvertTo-Json -Depth 10
 
