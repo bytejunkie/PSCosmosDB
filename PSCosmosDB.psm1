@@ -306,20 +306,20 @@ Param(
         if ($collectionName) {
             # we are looking for a specific database name
             if ($collectionsFound.id -like $collectionName) {
-                write-host "$collectionName found."
-                return $true
+                if ($moreinfo) {
+                    write-host "$collectionName found."
+                    return $collectionsFound | Where-Object { $_.id -like $collectionName }
                 } else {
-                    write-host "$collectionName not Found"
-                    return $false
+                    return $true
                 }
+            } else {
+                write-host "$collectionName not Found"
+                return $false
+            }
         } else {
             # we're not looking for a specific database
             Write-Host "Found $($Response._count) Collection(s)"
-            if ($moreinfo) {
-                return $collectionsFound
-                }else{
-                return $collectionsFound.id
-            }
+            return $collectionsFound.id
         }
 
     }
@@ -445,8 +445,8 @@ Param(
             }
 
         # build the URI
-        $uri = $rootUri + '/dbs/' + $dbname + '/colls' + $collectionName
-        $resourceID = 'dbs/' + $dbname
+        $uri = $rootUri + '/dbs/' + $dbname + '/colls/' + $collectionName
+        $resourceID = 'dbs/' + $dbname + '/colls/' + $collectionName
 
         # build the headers
         $headers = Get-Headers -action Delete -resourceType colls -resourceID $resourceID -primaryAccessKey $primaryAccessKey

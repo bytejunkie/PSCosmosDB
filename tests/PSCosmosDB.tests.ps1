@@ -68,13 +68,13 @@ Describe "New-CosmosDBCollection" {
             }
             for ($i = 1; $i -lt 5; $i++) {
                 $collectionName =  ("collection{0:N}" -f $i.ToString("000")) 
-                Get-CosmosDBCollection @splat  -CollectionName $collectionName | should not be $false
+                Get-CosmosDBCollection @splat -CollectionName $collectionName | should not be $false
             }
         }
 
         It "creates a collection with ttl" {
             New-CosmosDBCollection @splat -CollectionName 'collection06' -defaultCollectionTTL '19080'
-            (Get-CosmosDBCollection @splat -CollectionName 'collection06').defaultTTL | Should Not benullorempty
+            (Get-CosmosDBCollection @splat -CollectionName 'collection06' -moreinfo).defaultTTL | Should Not benullorempty
         }
     }
 
@@ -90,12 +90,11 @@ Describe "New-CosmosDBCollection" {
 
     Context "Remove-CosmosDBCollection" {
         It "removes a collection" {
-            Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
             Remove-CosmosDBCollection @splat -CollectionName "collection002" 
             Get-CosmosDBCollection @splat -CollectionName "collection002" | Should Be $false
         }
     }
 
     # need to remove the db we created to work on
-    #Remove-cosmosdbDatabase @splat
+    Remove-cosmosdbDatabase @splat
 }
