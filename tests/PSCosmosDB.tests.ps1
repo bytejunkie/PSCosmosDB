@@ -6,34 +6,30 @@ Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
 
 $config = Get-Content "$here\tests\config.json" | ConvertFrom-Json
 
-$splat = @{}
+$environmentVariables = @{}
 
-if ($config.emulatorAddress) {
-    $splat.Add("emulatorAddress", $config.emulatorAddress)
-} else {
-    $splat.Add('mydbaccount', $config.accountName)
-}
+$config.psobject.properties | foreach {$environmentVariables[$_.Name] = $_.Value}
 
-if ($config.primaryAccessKey) {
-    $splat.Add("primaryAccessKey", $config.primaryAccessKey)
-} else {
+
+if ($environmentVariables.AccountName) {
+    if ((get-azurermcontext).subscription.Id -like "") {write-host "Run Login-AzureRMAccount to login to Azure";break}
     $keys = Invoke-AzureRmResourceAction -Action listKeys `
-                                        -ResourceType "Microsoft.DocumentDb/databaseAccounts" `
-                                        -ApiVersion "2015-04-08" `
-                                        -ResourceGroupName $resourceGroupName `
-                                        -Name $myDbAccount.toLower() `
-                                        -Force -ErrorAction Stop
-    $splat.Add("primaryAccessKey", $keys.primaryMasterKey)
+        -ResourceType "Microsoft.DocumentDb/databaseAccounts" `
+        -ApiVersion "2015-04-08" `
+        -ResourceGroupName $environmentVariables.ResourceGroupName `
+        -Name $environmentVariables.AccountName.toLower() `
+        -Force -ErrorAction Stop
+    $environmentVariables.Add("primaryAccessKey", $keys.primaryMasterKey)
+    $environmentVariables.Remove('ResourceGroupName')
 }
-if ($config.ResourceGroupName) { $splat.Add('resourceGroupName', $config.ResourceGroupName)}
 
 Describe "CosmosDB Database Commands" {
 
     Context "New-CosmosDBDatabase creates a new database" {
 
         It "creates a database" {
-            New-cosmosdbDatabase @splat -dbname 'database02'
-            Get-cosmosdbDatabase @splat -dbname 'database02' | Should be $true
+            New-cosmosdbDatabase @environmentVariables -dbname 'database02'
+            Get-cosmosdbDatabase @environmentVariables -dbname 'database02' | Should be $true
         }
 
     }
@@ -41,64 +37,69 @@ Describe "CosmosDB Database Commands" {
     Context "Get-CosmosDBDatabases connects to account, returns info" {
     
         It "returns databases" {
-            (Get-CosmosDBDatabase @splat ).count | Should BeGreaterThan 0
+            (Get-CosmosDBDatabase @environmentVariables ).count | Should BeGreaterThan 0
             }
         
         It "returns a single database" {
-            Get-CosmosDBDatabase @splat -dbname 'database02' | Should not be $False
+            Get-CosmosDBDatabase @environmentVariables -dbname 'database02' | Should not be $False
         }
     }
 
     Context "Remove-CosmodDBDatabase removes a CosmosDB Database" {
         It "removes a database" {
-            Remove-CosmosDBDatabase @splat -DBName 'database02'
-            Get-cosmosdbDatabase @splat -dbname 'database02' | Should be $false
+            Remove-CosmosDBDatabase @environmentVariables -DBName 'database02'
+            Get-cosmosdbDatabase @environmentVariables -dbname 'database02' | Should be $false
         }
     }
 }
 
 Describe "New-CosmosDBCollection" {
     
-    $splat.add( "dbname", 'database02' )
+    $environmentVariables.add( "dbname", 'database02' )
     # need to make sure there is a db to work on
-    New-cosmosdbDatabase @splat
+    New-cosmosdbDatabase @environmentVariables
     
     Context "creates DB Collections" {
         It "creates a new Cosmos DB Collection" {
             for ($i = 1; $i -lt 5; $i++) {
                 $collectionName =  ("collection{0:N}" -f $i.ToString("000")) 
-                New-CosmosDBCollection @splat -CollectionName $collectionName
+                New-CosmosDBCollection @environmentVariables -CollectionName $collectionName
                 
             }
             for ($i = 1; $i -lt 5; $i++) {
                 $collectionName =  ("collection{0:N}" -f $i.ToString("000")) 
-                Get-CosmosDBCollection @splat -CollectionName $collectionName | should not be $false
+                Get-CosmosDBCollection @environmentVariables -CollectionName $collectionName | should not be $false
             }
         }
 
         It "creates a collection with ttl" {
-            New-CosmosDBCollection @splat -CollectionName 'collection06' -defaultCollectionTTL '19080'
-            (Get-CosmosDBCollection @splat -CollectionName 'collection06' -moreinfo).defaultTTL | Should Not benullorempty
+            New-CosmosDBCollection @environmentVariables -CollectionName 'collection06' -defaultCollectionTTL '19080'
+            (Get-CosmosDBCollection @environmentVariables -CollectionName 'collection06' -moreinfo).defaultTTL | Should Not benullorempty
         }
+        It "creates a collection with partition key" {
+            New-CosmosDBCollection @environmentVariables -CollectionName 'collection07' -partitionKey '/pkey'
+            (Get-CosmosDBCollection @environmentVariables -CollectionName 'collection07' -moreinfo).partitionKey | Should Not benullorempty
+        }
+
     }
 
     Context "Get-CosmosDBCollection" {
         It "returns collections" {
-            (Get-CosmosDBCollection @splat).count | should BeGreaterThan 0
+            (Get-CosmosDBCollection @environmentVariables).count | should BeGreaterThan 0
         }
 
         It "returns a single collection" {
-            Get-CosmosDBCollection @splat -CollectionName "collection004" | Should Be $true
+            Get-CosmosDBCollection @environmentVariables -CollectionName "collection004" | Should Be $true
         }
     }
 
     Context "Remove-CosmosDBCollection" {
         It "removes a collection" {
-            Remove-CosmosDBCollection @splat -CollectionName "collection002" 
-            Get-CosmosDBCollection @splat -CollectionName "collection002" | Should Be $false
+            Remove-CosmosDBCollection @environmentVariables -CollectionName "collection002" 
+            Get-CosmosDBCollection @environmentVariables -CollectionName "collection002" | Should Be $false
         }
     }
 
     # need to remove the db we created to work on
-    Remove-cosmosdbDatabase @splat
+    Remove-cosmosdbDatabase @environmentVariables
 }

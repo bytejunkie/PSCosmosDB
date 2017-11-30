@@ -352,7 +352,11 @@ Param(
             $xmsofferthroughput = '400',
 
             [Parameter()]
-            [int]$defaultCollectionTTL
+            [int]$defaultCollectionTTL,
+
+            [Parameter()]
+            [string]$partitionKey
+
         )
 
         # the URI string for the Cosmos DB instance
@@ -404,10 +408,16 @@ Param(
             indexingPolicy=$indexObject
         }
         
+        foreach ($key in $partitionKey) {
+            $partitionKeys = @()
+            $partitionKeys += $key
+        }
+
+
         if ($defaultCollectionTTL) { $body.Add('defaultTtl', $defaultCollectionTTL) }
         if ($partitionKey) {
             $partitionKeyObject = @{
-                "paths" = $partitionKey;
+                "paths" = $partitionKeys;
                 "kind" = 'hash';
             }
             $body.Add('partitionKey', $partitionKeyObject)
