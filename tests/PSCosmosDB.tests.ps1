@@ -99,7 +99,37 @@ Describe "New-CosmosDBCollection" {
             Get-CosmosDBCollection @environmentVariables -CollectionName "collection002" | Should Be $false
         }
     }
-
-    # need to remove the db we created to work on
-    Remove-cosmosdbDatabase @environmentVariables
 }
+
+Describe "CosmosDBDatabaseUser commands" {
+
+    It "creates a user" {
+        New-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredit" | Should Not Be $false
+    }
+
+    It "gets users" {
+        Get-CosmosDBDatabaseUser @environmentVariables | should Not Be $False
+    } # it needs work to be able to get specific users.
+
+    It "removes a user" {
+        Remove-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredit" | should Not Be $False
+    }
+}
+
+
+Describe "CosmosDBPermission commands" {
+    # going to need to recreate a user.
+    New-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredit"
+
+    It "creates a permission" {
+    New-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' -permissionResourceName 'dbs/database02/colls/collection001'
+    }
+    
+    It "Retrieves permissions" {
+        Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
+        Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" | Should Not BeNullOrEmpty
+        }
+    }
+    
+# need to remove the db we created to work on
+# Remove-cosmosdbDatabase @environmentVariables

@@ -593,3 +593,259 @@ Param(
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $document -ContentType 'application/json'
         write-host "Upserted document with id $($response.id)"
     }
+
+    function Get-CosmosDBDatabaseUser {
+        
+                [CmdletBinding()]
+                Param(
+        
+                    # the dbName to add a collection to
+                    [Parameter(Mandatory=$true)]
+                    [string]$DBName,
+        
+                    # the account name to connect to
+                    [Parameter(ParameterSetName="accountName")]
+                    [string]$accountName, 
+        
+                    # the emulatorAddress to connect to
+                    [Parameter(ParameterSetName="emulatorAddress")]
+                    [string]$emulatorAddress, 
+        
+                    # primary Access Key for the doc DB instance
+                    [Parameter(Mandatory=$true)]
+                    [string]$primaryAccessKey
+        
+                )
+
+                <#
+                .TODO 
+                - this function needs to take a specific user and check for that user.
+                - should also output more into on the user.
+
+                #>
+
+        
+                # the URI string for the Cosmos DB instance
+                # we need to work out if we're working against the emulator or the cloud
+                if ($emulatorAddress) { 
+                    $rootUri = $emulatorAddress
+                    } else {
+                        $rootUri =  'https://' + $accountName + '.documents.azure.com'
+                    }
+                
+                # build the URI that we are sending the request to
+                $uri = $rootUri + '/dbs/' + $DBName + '/users'
+                $resourceID = 'dbs/' + $DBName
+        
+                # build the headers
+                $headers = Get-Headers -action 'Get' -resourceType 'users' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+        
+                $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+                return $response
+                
+            }
+
+    function New-CosmosDBDatabaseUser {
+
+        [CmdletBinding()]
+        Param(
+
+            # the dbName to add a collection to
+            [Parameter(Mandatory=$true)]
+            [string]$DBName,
+
+            # the account name to connect to
+            [Parameter(ParameterSetName="accountName")]
+            [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
+
+            # primary Access Key for the doc DB instance
+            [Parameter(Mandatory=$true)]
+            [string]$primaryAccessKey,
+
+            # the user to create
+            [Parameter(Mandatory=$true)]
+            [string]$user
+
+        )
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
+        
+        $body = @{"id"=$user;} | ConvertTo-Json
+
+        # build the URI that we are sending the request to
+        $uri = $rootUri + '/dbs/' + $DBName + '/users'
+        $resourceID = 'dbs/' + $DBName
+
+        # build the headers
+        $headers = Get-Headers -action 'Post' -resourceType 'users' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+
+        $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+        
+    }
+
+    function Remove-CosmosDBDatabaseUser {
+        
+        [CmdletBinding()]
+        Param(
+
+            # the dbName to add a collection to
+            [Parameter(Mandatory=$true)]
+            [string]$DBName,
+
+            # the account name to connect to
+            [Parameter(ParameterSetName="accountName")]
+            [string]$accountName, 
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
+
+            # primary Access Key for the doc DB instance
+            [Parameter(Mandatory=$true)]
+            [string]$primaryAccessKey,
+
+            # the user to remove
+            [Parameter(Mandatory=$true)]
+            [string]$user
+
+        )
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
+        
+        # build the URI that we are sending the request to
+        $uri = $rootUri + '/dbs/' + $DBName + '/users/' + $user
+        $resourceID = 'dbs/' + $DBName+ '/users/' + $user
+
+        # build the headers
+        $headers = Get-Headers -action 'Delete' -resourceType 'users' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+
+        $response = Invoke-RestMethod -Uri $uri -Method Delete -Headers $headers
+        return $response
+    }
+
+
+    function Get-CosmosDBUserPermission {
+                
+        [CmdletBinding()]
+        Param(
+
+            # the account name to connect to
+            [Parameter(ParameterSetName="accountName")]
+            [string]$accountName, 
+
+            # primary Access Key for the doc DB instance
+            [Parameter(Mandatory=$true)]
+            [string]$primaryAccessKey,
+
+            # the emulatorAddress to connect to
+            [Parameter(ParameterSetName="emulatorAddress")]
+            [string]$emulatorAddress, 
+
+            # the dbName to add a collection to
+            [Parameter(Mandatory=$true)]
+            [string]$DBName,
+
+            # the user that we are adding the permission for 
+            [Parameter(Mandatory=$true)]
+            [string]$user
+
+            )
+
+        # the URI string for the Cosmos DB instance
+        # we need to work out if we're working against the emulator or the cloud
+        if ($emulatorAddress) { 
+            $rootUri = $emulatorAddress
+            } else {
+                $rootUri =  'https://' + $accountName + '.documents.azure.com'
+            }
+        
+
+    
+        # build the URI that we are sending the request to
+        $uri = $rootUri + '/dbs/' + $DBName + '/users/' + $user + '/permissions'
+        $resourceID = 'dbs/' + $DBName + '/users/' + $user
+
+        # build the headers
+        $headers = Get-Headers -action 'Get' -resourceType 'permissions' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+
+        $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+        $response
+    }
+
+    function New-CosmosDBUserPermission {
+        
+                [CmdletBinding()]
+                Param(
+        
+                    # the account name to connect to
+                    [Parameter(ParameterSetName="accountName")]
+                    [string]$accountName, 
+        
+                    # primary Access Key for the doc DB instance
+                    [Parameter(Mandatory=$true)]
+                    [string]$primaryAccessKey,
+
+                    # the emulatorAddress to connect to
+                    [Parameter(ParameterSetName="emulatorAddress")]
+                    [string]$emulatorAddress, 
+        
+                    # the dbName to add a collection to
+                    [Parameter(Mandatory=$true)]
+                    [string]$DBName,
+      
+                    # the user that we are adding the permission for 
+                    [Parameter(Mandatory=$true)]
+                    [string]$user,
+
+                    # the id to give the permission we are creating
+                    [Parameter(Mandatory=$true)]
+                    [string]$PermissionId,
+
+                    # the permission mode to set on the resource
+                    [Parameter()][ValidateSet("All","Read")]
+                    [string]$PermissionMode = "read",
+
+                    # the resource type that we are setting the permission against
+                    [Parameter(Mandatory=$true)]
+                    [string]$PermissionResourceName
+
+                    )
+        
+                # the URI string for the Cosmos DB instance
+                # we need to work out if we're working against the emulator or the cloud
+                if ($emulatorAddress) { 
+                    $rootUri = $emulatorAddress
+                    } else {
+                        $rootUri =  'https://' + $accountName + '.documents.azure.com'
+                    }
+                
+                $body = @{"id"=$PermissionId;"permissionMode"=$PermissionMode;"resource"=$PermissionResourceName} | ConvertTo-Json
+        
+            
+                # build the URI that we are sending the request to
+                $uri = $rootUri + '/dbs/' + $DBName + '/users/' + $user + '/permissions'
+                $resourceID = 'dbs/' + $DBName + '/users/' + $user
+        
+                # build the headers
+                $headers = Get-Headers -action 'Post' -resourceType 'permissions' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
+        
+                $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+                $response
+            }
+        
