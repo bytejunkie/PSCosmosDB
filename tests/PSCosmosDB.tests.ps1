@@ -119,21 +119,23 @@ Describe "CosmosDBDatabaseUser commands" {
 
 Describe "CosmosDBPermission commands" {
     # going to need to recreate a user.
-    New-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredit"
+        New-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredits"
+        
 
     It "creates a permission" {
-    New-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' -permissionResourceName 'dbs/database02/colls/collection001'
+        (New-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' -permissionResourceName 'dbs/database02/colls/collection001').id |  Should Not BeNullOrEmpty
     }
     
-    It "Retrieves permissions" {
-        Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" | Should Not BeNullOrEmpty
+    It "Retrieves permissions for a user on a db" {
+        (Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit").Permissions  | Should Not BeNullOrEmpty
     }
 
     It "Removes permissions" {
         Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
-        Remove-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' | Should Not BeNullOrEmpty
+        $response = Remove-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' | Should Not BeNullOrEmpty
+        $response
     }
-        }
+}
     
 # need to remove the db we created to work on
- Remove-cosmosdbDatabase @environmentVariables
+ # Remove-cosmosdbDatabase @environmentVariables

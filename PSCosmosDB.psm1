@@ -253,7 +253,7 @@ Param(
         $headers = Get-Headers -action Delete -resourceType dbs -resourceId $resourceID -primaryAccessKey $primaryAccessKey
 
         $response = Invoke-RestMethod -Uri $uri -Method Delete -Headers $headers
-        write-host $response
+        return $response
     }
 
     function Get-CosmosDBCollection {
