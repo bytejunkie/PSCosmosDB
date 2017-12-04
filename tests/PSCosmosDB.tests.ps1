@@ -126,10 +126,14 @@ Describe "CosmosDBPermission commands" {
     }
     
     It "Retrieves permissions" {
-        Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
         Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" | Should Not BeNullOrEmpty
-        }
     }
+
+    It "Removes permissions" {
+        Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
+        Remove-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" | Should Not BeNullOrEmpty
+    }
+        }
     
 # need to remove the db we created to work on
 # Remove-cosmosdbDatabase @environmentVariables
