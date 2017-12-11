@@ -26,7 +26,7 @@ $primaryAccessKey = "weflnweflwef/.wecwef./wfwef/=="
 
 ```
 
-*NEW*
+## *NEW* Using the Tests
 You should use a config file if you want the tests to run. 
 Create a file called config.json in the tests folder.
 The config file will take on of two formats.
@@ -38,6 +38,9 @@ The config file will take on of two formats.
     "primaryAccessKey": "CX2lwneflwenfwelnflweknfls .adma.skdad=="
 }
 ```
+These details are given out by the emulator when it starts up. Dont forget to import the cert.
+More info on the emulator [Cosmos DB Emulator](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator)
+
 ### if you're running against an instance of Cosmos DB
 ```
 {
@@ -45,8 +48,6 @@ The config file will take on of two formats.
     "resourceGroupName": "CosmosDBRGR001"
 }
 ```
-
-
 
 query away...
 
@@ -112,3 +113,60 @@ New-CosmosDBDocument -AccountName $accountName -PrimaryAccessKey $primaryAccessK
                             -Document <insert_JSON_document_here>
 ```
 
+### List one or all Database Users
+```powershell
+# List all users
+Get-CosmosDBDatabaseUser -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+
+#List single user with more info
+Get-CosmosDBDatabaseUser -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> -moreinfo
+```
+
+### create a new Database User
+```powershell
+New-CosmosDBDatabaseUser -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> -moreinfo
+```
+
+### remove a Database User
+```powershell
+Remove-CosmosDBDatabaseUser -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> -moreinfo
+```
+
+### List one or all permissions for a certain user
+```powershell
+# List all permissions, with more info
+Get-CosmosDBUserPermission -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> -moreinfo
+
+# List a specific permission against a specific user, or return $false
+Get-CosmosDBUserPermission -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> `
+                            -PermissionId <insert_permission_id>
+```
+
+### create a new User Permission on a database
+```powershell
+New-CosmosDBUserPermission -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> `
+                            -PermissionId <insert_permission_id> `
+                            -PermissionMode <insert_permission_id> `
+                            -PermissionResourceName <insert_permission_id>
+```
+
+### remove a User Permission on a database
+```powershell
+Remove-CosmosDBUserPermission -AccountName $accountName -PrimaryAccessKey $primaryAccessKey `
+                            -DBName <insert_db_name_here> `
+                            -User <insert_username> `
+                            -PermissionId <insert_permission_id>
+```
