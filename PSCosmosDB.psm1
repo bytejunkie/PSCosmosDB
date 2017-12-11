@@ -612,8 +612,14 @@ Param(
 
             # primary Access Key for the doc DB instance
             [Parameter(Mandatory=$true)]
-            [string]$primaryAccessKey
+            [string]$primaryAccessKey,
 
+            # specific user to look for
+            [Parameter()]
+            [string]$user,
+            
+            # return additional info on the user
+            [switch]$moreinfo = $false
         )
 
         <#
@@ -640,7 +646,28 @@ Param(
         $headers = Get-Headers -action 'Get' -resourceType 'users' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
 
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
-        return $response
+        if ($user ) {
+            # we are looking for a specific db user
+            if ($response.Users.id -like $user ) {
+                write-host "$user found"
+                if ($moreinfo) {
+                    return $response.Users | Where-Object { $_.id -like $user }
+                } else { 
+                    return $true
+                }
+            } else {
+                write-host "$user not found"
+                return $false
+            }
+        } else {
+            # we're not looking for specific users
+            write-host "$($response.Users.Count) Users found."
+            if ($moreinfo) {
+                return $response.Users
+            } else {
+                return $response.Users.id 
+            }
+        }
         
     }
 
@@ -759,9 +786,16 @@ Param(
             [Parameter(Mandatory=$true)]
             [string]$DBName,
 
-            # the user that we are adding the permission for 
+            # the user that we are looking for the permission for 
             [Parameter(Mandatory=$true)]
-            [string]$user
+            [string]$user,
+
+            # the specific Permission that we are looking for 
+            [Parameter()]
+            [string]$PermissionId,
+
+            # return additional info on the user
+            [switch]$moreinfo = $false
 
             )
 
@@ -772,8 +806,6 @@ Param(
             } else {
                 $rootUri =  'https://' + $accountName + '.documents.azure.com'
             }
-        
-
     
         # build the URI that we are sending the request to
         $uri = $rootUri + '/dbs/' + $DBName + '/users/' + $user + '/permissions'
@@ -783,7 +815,28 @@ Param(
         $headers = Get-Headers -action 'Get' -resourceType 'permissions' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
 
         $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+        if ($PermissionId) {
+            # we are looking for a specific permission
+            if ($response.permissions.id -like $PermissionId ){
+                write-host "$($PermissionID) found"
+                if ($moreinfo) {
+                    return $response.Permissions | Where-Object { $_.id -like $PermissionId }
+                } else {
+                    return $true
+                }
+            }
+        } else {
+            write-host "$($response.Permissions.Count) Permission(s) found."
+            if ($moreinfo) {
+                return $response.Permissions
+            } else {
+                return $response.Permissions.id
+            }
+        }
+
+
         return $response
+
     }
 
     function New-CosmosDBUserPermission {
