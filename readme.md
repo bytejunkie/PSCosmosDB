@@ -26,6 +26,28 @@ $primaryAccessKey = "weflnweflwef/.wecwef./wfwef/=="
 
 ```
 
+*NEW*
+You should use a config file if you want the tests to run. 
+Create a file called config.json in the tests folder.
+The config file will take on of two formats.
+
+### if you're running against the emulator
+```
+{
+    "emulatorAddress": "https://192.168.1.1:8080/",
+    "primaryAccessKey": "CX2lwneflwenfwelnflweknfls .adma.skdad=="
+}
+```
+### if you're running against an instance of Cosmos DB
+```
+{
+    "accountName": "cosmosdb001",
+    "resourceGroupName": "CosmosDBRGR001"
+}
+```
+
+
+
 query away...
 
 ### list databases
