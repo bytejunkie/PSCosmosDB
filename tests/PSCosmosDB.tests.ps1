@@ -37,7 +37,7 @@ Describe "CosmosDB Database Commands" {
     Context "Get-CosmosDBDatabases connects to account, returns info" {
     
         It "returns databases" {
-            (Get-CosmosDBDatabase @environmentVariables ).count | Should BeGreaterThan 0
+            (Get-CosmosDBDatabase @environmentVariables).count | Should BeGreaterThan 0
             }
         
         It "returns a single database" {
@@ -101,6 +101,22 @@ Describe "New-CosmosDBCollection" {
     }
 }
 
+Describe "CosmosDB Document Functions" {
+
+    Context "Get-CosmosDBDocuments" {
+        It "creates a new Document" {
+            $document = get-date | ConvertTo-Json
+            (New-CosmosDBDocument @environmentVariables -CollectionName "collection003" -document $document).id | Should Not BeNullOrEmpty 
+        }
+                    
+        It "returns a list of Documents" {
+            Get-CosmosDBDocument @environmentVariables -CollectionName "collection002" | should not BeNullOrEmpty
+        }
+
+    }
+
+}
+
 Describe "CosmosDBDatabaseUser commands" {
 
     It "creates a user" {
@@ -124,7 +140,7 @@ Describe "CosmosDBDatabaseUser commands" {
     }
     
     It "removes a user" {
-        Remove-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredit" | should Not Be $False
+        Remove-CosmosDBDatabaseUser @environmentVariables -user "mattshort@callcredit" | should Be $True
     }
 }
 
@@ -142,22 +158,22 @@ Describe "CosmosDBPermission commands" {
         (Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit").Count  | Should BeGreaterThan 0
     }
 
-    It "Retrieves permissions for a user on a db" {
+    It "Retrieves permissions with more info for a user on a db" {
         Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -moreinfo | Should Not BeNullOrEmpty
     }
 
-    It "Retrieves permissions for a user on a db" {
+    It "Retrieves a specific permission for a user on a db" {
         Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission'  | Should Be $true
     }
 
-    It "Retrieves permissions for a user on a db" {
+    It "Retrieves specific permissions with more info for a user on a db" {
         Get-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' -moreinfo  | Should Not BeNullOrEmpty
     }
 
     It "Removes permissions" {
-        Remove-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' | Should Not BeNullOrEmpty
+        Remove-CosmosDBUserPermission @environmentVariables -user "mattshort@callcredit" -permissionId 'brand-new-permission' | Should Be $true
     }
 }
     
 # need to remove the db we created to work on
-Remove-cosmosdbDatabase @environmentVariables
+#Remove-cosmosdbDatabase @environmentVariables

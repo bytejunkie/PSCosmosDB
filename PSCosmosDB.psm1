@@ -72,7 +72,8 @@ Param(
 
         # call the function to generate the authToken
         $authToken = New-AuthToken -Verb $action -resourceType $resourceType -resourceID $resourceId -Date $date -primaryAccessKey $primaryAccessKey
-        
+        write-verbose $authToken
+
         # create the headers, add the fields.
         $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
         $headers.Add("Authorization", $authToken)
@@ -761,8 +762,12 @@ Param(
         # build the headers
         $headers = Get-Headers -action 'Delete' -resourceType 'users' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
 
-        $response = Invoke-RestMethod -Uri $uri -Method Delete -Headers $headers
-        return $response
+        $response = Invoke-WebRequest -Uri $uri -Method Delete -Headers $headers
+        If ($response.StatusCode -like "204") {
+            return $true
+        } else {
+            return $false
+        }
     }
 
 
@@ -944,6 +949,10 @@ Param(
                 # build the headers
                 $headers = Get-Headers -action 'Delete' -resourceType 'permissions' -resourceID $resourceID -primaryAccessKey $primaryAccessKey
         
-                $response = Invoke-RestMethod -Uri $uri -Method Delete -Headers $headers
-                return $response
+                $response = Invoke-WebRequest -Uri $uri -Method Delete -Headers $headers
+                If ($response.StatusCode -like "204") {
+                    return $true
+                } else {
+                    return $false
+                }
             }
