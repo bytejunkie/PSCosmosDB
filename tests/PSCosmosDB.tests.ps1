@@ -105,12 +105,12 @@ Describe "CosmosDB Document Functions" {
 
     Context "Get-CosmosDBDocuments" {
         It "creates a new Document" {
-            $document = get-date | ConvertTo-Json
-            (New-CosmosDBDocument @environmentVariables -CollectionName "collection003" -document $document).id | Should Not BeNullOrEmpty 
+            $document = @{"id"="theVaders";"father"="darth";"son"="luke";} | ConvertTo-Json
+            (New-CosmosDBDocument @environmentVariables -CollectionName "collection06" -document $document).id | Should Not BeNullOrEmpty 
         }
                     
         It "returns a list of Documents" {
-            Get-CosmosDBDocument @environmentVariables -CollectionName "collection002" | should not BeNullOrEmpty
+            Get-CosmosDBDocument @environmentVariables -CollectionName "collection06" -documentID "theVaders" | should not BeNullOrEmpty
         }
 
     }
@@ -176,4 +176,4 @@ Describe "CosmosDBPermission commands" {
 }
     
 # need to remove the db we created to work on
-#Remove-cosmosdbDatabase @environmentVariables
+Remove-cosmosdbDatabase @environmentVariables
