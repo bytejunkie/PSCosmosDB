@@ -169,7 +169,7 @@ Param(
             Write-Host "Found $($Response._count) Database(s)"
             if ($moreinfo) {
                 return $databasesFound
-                }else{
+            } else {
                 return $databasesFound.id
             }
         }
@@ -323,8 +323,12 @@ Param(
             }
         } else {
             # we're not looking for a specific database
-            Write-Host "Found $($Response._count) Collection(s)"
-            return $collectionsFound.id
+			if ($moreinfo) {
+                Write-Host "Found $($Response._count) Collection(s)"
+				return $collectionsFound
+			} else {
+                return $collectionsFound.id
+			}
         }
 
     }
