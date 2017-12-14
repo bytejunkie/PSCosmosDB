@@ -155,11 +155,15 @@ Param(
             # we are looking for a specific database name
             if ($databasesFound.id -like $DBName) {
                 write-host "$DBName found."
-                return $true
-                } else {
-                    write-host "$DBName not Found"
-                    return $false
-                }
+			    if ($moreinfo) {
+			        return $databasesFound | Where-Object { $_.id -like $DBName }
+			    } else {
+                    return $true
+			    }
+            } else {
+                write-host "$DBName not Found"
+                return $false
+            }
         } else {
             # we're not looking for a specific database
             Write-Host "Found $($Response._count) Database(s)"
@@ -593,6 +597,7 @@ Param(
 
         $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $document -ContentType 'application/json'
         write-host "Upserted document with id $($response.id)"
+		return $true
     }
 
     function Get-CosmosDBDatabaseUser {

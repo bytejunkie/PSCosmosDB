@@ -1,2 +1,5 @@
 tests/config.json
 .vscode/*
+/.vs/config/applicationhost.config
+/.vs/PSCosmosDB/v14/.suo
+/tests/config.json.old
