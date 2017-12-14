@@ -4,12 +4,16 @@ $ModulePath = "$here\$sut" -replace 'ps1', 'psd1'
 
 Import-Module -Name $ModulePath -Force -Verbose -ErrorAction Stop
 
-$config = Get-Content "$here\tests\config.json" | ConvertFrom-Json
+if (!(Test-Path "$here\tests\config.json")) {
+    Write-Host "tests\Config.json file not found. Please check readme.md"
+	break
+} else {
+    $config = Get-Content "$here\tests\config.json" | ConvertFrom-Json
+}
 
 $environmentVariables = @{}
 
 $config.psobject.properties | foreach {$environmentVariables[$_.Name] = $_.Value}
-
 
 if ($environmentVariables.AccountName) {
     if ((get-azurermcontext).subscription.Id -like "") {write-host "Run Login-AzureRMAccount to login to Azure";break}
@@ -23,13 +27,15 @@ if ($environmentVariables.AccountName) {
     $environmentVariables.Remove('ResourceGroupName')
 }
 
+Write-host "environmentvariables" @environmentVariables
+
 Describe "CosmosDB Database Commands" {
 
     Context "New-CosmosDBDatabase creates a new database" {
 
         It "creates a database" {
-            New-cosmosdbDatabase @environmentVariables -dbname 'database02'
-            Get-cosmosdbDatabase @environmentVariables -dbname 'database02' | Should be $true
+            New-cosmosdbDatabase @environmentVariables -dbname 'database002'
+            Get-cosmosdbDatabase @environmentVariables -dbname 'database002' | Should be $true
         }
 
     }
@@ -39,23 +45,25 @@ Describe "CosmosDB Database Commands" {
         It "returns databases" {
             (Get-CosmosDBDatabase @environmentVariables).count | Should BeGreaterThan 0
             }
-        
         It "returns a single database" {
-            Get-CosmosDBDatabase @environmentVariables -dbname 'database02' | Should not be $False
+            Get-CosmosDBDatabase @environmentVariables -dbname 'database002' | Should not be $False
         }
+	    It "returns moreinfo if requested" {
+		    ((Get-CosmosDBDatabase @environmentVariables -dbname "database002" -moreinfo)._self).length | Should BeGreaterThan 0
+		}
     }
 
     Context "Remove-CosmodDBDatabase removes a CosmosDB Database" {
         It "removes a database" {
-            Remove-CosmosDBDatabase @environmentVariables -DBName 'database02'
-            Get-cosmosdbDatabase @environmentVariables -dbname 'database02' | Should be $false
+            Remove-CosmosDBDatabase @environmentVariables -DBName 'database002'
+            Get-cosmosdbDatabase @environmentVariables -dbname 'database002' | Should be $false
         }
     }
 }
 
 Describe "New-CosmosDBCollection" {
     
-    $environmentVariables.add( "dbname", 'database02' )
+    $environmentVariables.add( "dbname", 'database002' )
     # need to make sure there is a db to work on
     New-cosmosdbDatabase @environmentVariables
     
@@ -73,12 +81,12 @@ Describe "New-CosmosDBCollection" {
         }
 
         It "creates a collection with ttl" {
-            New-CosmosDBCollection @environmentVariables -CollectionName 'collection06' -defaultCollectionTTL '19080'
-            (Get-CosmosDBCollection @environmentVariables -CollectionName 'collection06' -moreinfo).defaultTTL | Should Not benullorempty
+            New-CosmosDBCollection @environmentVariables -CollectionName 'collection006' -defaultCollectionTTL '19080'
+            (Get-CosmosDBCollection @environmentVariables -CollectionName 'collection006' -moreinfo).defaultTTL | Should Not benullorempty
         }
         It "creates a collection with partition key" {
-            New-CosmosDBCollection @environmentVariables -CollectionName 'collection07' -partitionKey '/pkey'
-            (Get-CosmosDBCollection @environmentVariables -CollectionName 'collection07' -moreinfo).partitionKey | Should Not benullorempty
+            New-CosmosDBCollection @environmentVariables -CollectionName 'collection007' -partitionKey '/pkey'
+            (Get-CosmosDBCollection @environmentVariables -CollectionName 'collection007' -moreinfo).partitionKey | Should Not benullorempty
         }
 
     }
@@ -87,10 +95,12 @@ Describe "New-CosmosDBCollection" {
         It "returns collections" {
             (Get-CosmosDBCollection @environmentVariables).count | should BeGreaterThan 0
         }
-
         It "returns a single collection" {
             Get-CosmosDBCollection @environmentVariables -CollectionName "collection004" | Should Be $true
         }
+	    It "returns moreinfo if requested" {
+		    ((Get-CosmosDBCollection @environmentVariables -CollectionName "collection004" -moreinfo)._self).length | Should BeGreaterThan 0
+		}
     }
 
     Context "Remove-CosmosDBCollection" {
@@ -106,11 +116,11 @@ Describe "CosmosDB Document Functions" {
     Context "Get-CosmosDBDocuments" {
         It "creates a new Document" {
             $document = @{"id"="theVaders";"father"="darth";"son"="luke";} | ConvertTo-Json
-            (New-CosmosDBDocument @environmentVariables -CollectionName "collection06" -document $document).id | Should Not BeNullOrEmpty 
+            New-CosmosDBDocument @environmentVariables -CollectionName "collection006" -document $document | Should be $true
         }
                     
         It "returns a list of Documents" {
-            Get-CosmosDBDocument @environmentVariables -CollectionName "collection06" -documentID "theVaders" | should not BeNullOrEmpty
+            Get-CosmosDBDocument @environmentVariables -CollectionName "collection006" -documentID "theVaders" | should not BeNullOrEmpty
         }
 
     }
@@ -151,7 +161,7 @@ Describe "CosmosDBPermission commands" {
         
 
     It "creates a permission" {
-        (New-CosmosDBUserPermission @environmentVariables -user "mattshort@gmail" -permissionId 'brand-new-permission' -permissionResourceName 'dbs/database02/colls/collection001').id |  Should Not BeNullOrEmpty
+        (New-CosmosDBUserPermission @environmentVariables -user "mattshort@gmail" -permissionId 'brand-new-permission' -permissionResourceName 'dbs/database002/colls/collection001').id |  Should Not BeNullOrEmpty
     }
     
     It "Retrieves permissions for a user on a db" {
